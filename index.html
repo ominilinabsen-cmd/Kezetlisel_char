@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Досье персонажа | Солнечный эльф</title>
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b110f;
+      --bg-card: #121c18;
+      --gold: #d4af37;
+      --gold-soft: rgba(212, 175, 55, 0.35);
+      --emerald: #1e4d3b;
+      --text-main: #e8e2d5;
+      --text-muted: #a39e93;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at 20% 20%, #162922 0%, #0b110f 70%);
+      color: var(--text-main);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 19px;
+      line-height: 1.65;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    /* Левая колонка с портретом */
+    .portrait-card {
+      background: var(--bg-card);
+      border: 1px solid var(--gold-soft);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: sticky;
+      top: 30px;
+    }
+
+    .portrait-frame {
+      position: relative;
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      overflow: hidden;
+      aspect-ratio: 2 / 3;
+      background: #080c0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .portrait-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meta-table {
+      margin-top: 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    }
+
+    .meta-row:last-child { border-bottom: none; }
+    .meta-label { color: var(--text-muted); text-transform: uppercase; }
+    .meta-value { color: var(--gold); font-weight: 500; text-align: right; }
+
+    /* Правая колонка с контентом */
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--gold-soft);
+      border-radius: 8px;
+      padding: 36px 42px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .header {
+      border-bottom: 1px solid var(--gold-soft);
+      padding-bottom: 20px;
+      margin-bottom: 26px;
+    }
+
+    .subtitle {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+
+    /* Вкладки */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--gold-soft);
+      color: var(--text-muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 10px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--gold);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .tab-panel { display: none; animation: fadeIn 0.35s ease; }
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    p { margin-bottom: 18px; text-align: justify; }
+
+    h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      color: var(--gold);
+      margin: 24px 0 12px;
+      font-weight: 500;
+    }
+
+    /* Всплывающие подсказки для терминов */
+    .term {
+      color: var(--gold);
+      border-bottom: 1px dashed var(--gold);
+      cursor: help;
+      position: relative;
+      font-weight: 600;
+    }
+
+    .term::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      background: #070b09;
+      color: var(--text-main);
+      border: 1px solid var(--gold);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.45;
+      text-align: left;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.85);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 20;
+    }
+
+    .term:hover::after { opacity: 1; }
+
+    /* Словарь */
+    .glossary-list { list-style: none; }
+    .glossary-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    }
+    .glossary-list li:last-child { border-bottom: none; }
+    .glossary-word { color: var(--gold); font-weight: 600; font-size: 20px; }
+
+    /* Цитаты */
+    blockquote {
+      border-left: 2px solid var(--gold);
+      padding-left: 18px;
+      margin: 18px 0;
+      font-style: italic;
+      color: #d6cfc2;
+    }
+
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+      .portrait-card { position: static; max-width: 420px; margin: 0 auto; }
+      .content-card { padding: 26px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Левая колонка: портрет -->
+    <aside class="portrait-card">
+      <div class="portrait-frame">
+        <!-- Имя файла картинки должно быть elf.png -->
+        <img src="elf.png" alt="Портрет солнечного эльфа" />
+      </div>
+      <div class="meta-table">
+        <div class="meta-row">
+          <span class="meta-label">Народ</span>
+          <span class="meta-value">Солнечный эльф</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Призвание</span>
+          <span class="meta-value">Волшебник</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Кредо</span>
+          <span class="meta-value">Noblesse oblige</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Правая колонка: текст и вкладки -->
+    <main class="content-card">
+      <header class="header">
+        <div class="subtitle">Архив • Хроники персонажа</div>
+        <h1>Имя Персонажа</h1>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'appearance')">Облик и облачение</button>
+        <button class="tab-btn" onclick="openTab(event, 'glossary')">Словарь костюма</button>
+        <button class="tab-btn" onclick="openTab(event, 'character')">Этикет и речь</button>
+      </nav>
+
+      <!-- Вкладка 1 -->
+      <section id="appearance" class="tab-panel active">
+        <p>Случайный взгляд редко задерживается на нем, но если уж зацепится — не отпустит. Он походил на статую, выточенную из старого, потускневшего золота: высокий, с острыми, будто высеченными чертами лица. Казалось, что о его скулы и тонкий нос можно порезаться. Волосы цвета воронова крыла, отливающие холодной синевой, на макушке внезапно светлели, словно на черную птицу лёг иней, а на лбу их перехватывал строгий металлический <span class="term" data-tip="Тонкий металлический обруч или венец на лбу, придерживающий волосы; признак благородного происхождения.">серклет</span>. Его глаза — два осколка прозрачного изумруда, будто их промыли от пыли в родниковой воде. Кончики его тонких пальцев увенчаны длинными ногтями с аккуратной заточкой.</p>
+
+        <p>Столь же безупречно было выверено и его облачение, сочетающее аристократичный шик эпохи Возрождения с величественностью чародея. Поверх костюма был накинут распашной темно-зеленый <span class="term" data-tip="Распашная парадная мантия эпохи позднего Средневековья с широкими, длинными висячими рукавами.">упелянд</span> длиной до середины икры — парадная мантия с широкими, ниспадающими висячими рукавами, подбитыми золотистым шелком. Под распахнутыми полами упелянда виднелся приталенный терракотовый <span class="term" data-tip="Плотно прилегающий к торсу приталенный камзол эпохи Возрождения.">дублет</span> с глубоким V-образным вырезом, в котором на тонкой цепочке покоился искусный серебряный медальон с тонкой гравировкой. Составные рукава дублета украшали темно-синие пышные <span class="term" data-tip="Пышные, объемные вставки-фонарики на верхней части рукавов или на штанах.">буфы</span> у плеч, перехваченные на предплечьях узкими манжетами с белой кружевной отделкой.</p>
+
